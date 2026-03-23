@@ -1,8 +1,9 @@
 import pytest
 import requests
 import json
+import os
 
-BASE_URL = "http://localhost:8080/api/v1"
+BASE_URL = os.getenv("QUICKCART_URL", "http://localhost:8080/api/v1")
 ROLL_NUMBER = "2024101145"
 USER_ID = "1"
 

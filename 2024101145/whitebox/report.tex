@@ -21,144 +21,89 @@ The codebase was analyzed using \texttt{pylint}. Iterative changes were made to 
     \item Fixed the bank loan fund leakage bug and player net worth calculation.
 \end{itemize}
 
-\section{Bugs Found and Fixed}
-A white-box test suite consisting of 50+ test cases was developed and executed for the MoneyPoly game engine. The suite covers core components including the Bank, Player, Board, and Property management systems.
+\section{White Box Test Cases and Logical Isssues}
+Designed white-box test cases for the MoneyPoly game structure, covering all branches, key variable states, and edge cases.
 
 \begin{enumerate}
-    \item \textbf{Bank Loan Fund Integrity [CRITICAL]:} 
-    When a player takes a loan, the bank funds are not correctly deducted in the original code. The player receives the cash, but the bank's internal balance remains unchanged, allowing for infinite money creation. This was fixed by calling \texttt{self.pay_out(payout_amount)} within the \texttt{give_loan} method.
-    \item \textbf{Player Net Worth Calculation Error:} 
-    The \texttt{get_net_worth()} function in the \texttt{Player} class originally only considered liquid cash. It failed to account for the value of properties owned by the player. This was corrected by adding a loop to iterate through the player's property list and summing their market values.
-\end{enumerate}
-
-\section{White Box Test Cases}
-The test suite consists of 50+ collector items and cases, meticulously designed to validate the internal logic of the MoneyPoly game engine.
-
-\subsection{Bank Operations (20+ Cases)}
-\begin{enumerate}
-    \item \textbf{Initial Fund Verification}
+    \item \textbf{Test Case: Player Standard Movement}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{Bank()} instance.
-        \item \textbf{Expected Output:} Initial balance > 0, 0 loans.
-        \item \textbf{Justification:} Ensures the bank object initializes with a standard capital pool.
+        \item \textbf{Why needed:} Validates the basic state update of the \texttt{position} variable.
+        \item \textbf{Logic/Errors Found:} Initially, movement was strictly positional and did not account for modular board wrap-around logic in all edge cases.
     \end{itemize}
 
-    \item \textbf{Fund Collection}
+    \item \textbf{Test Case: Board Wrap-Around (Pass Go Salary)}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.collect(100)}.
-        \item \textbf{Expected Output:} Internal balance increases by exactly 100.
-        \item \textbf{Justification:} Validates deposit logic (income from taxes/properties).
+        \item \textbf{Why needed:} Tests the boundary condition where \texttt{position} exceeds \texttt{BOARD_SIZE}.
+        \item \textbf{Logic/Errors Found:} \textbf{Major Logical Issue:} The code originally only awarded salary if the player landed \textit{exactly} on position 0. It failed to award salary when \textit{passing} Go during a large move. Corrected to check if \texttt{new_position < old_position}.
     \end{itemize}
 
-    \item \textbf{Payout Logic}
+    \item \textbf{Test Case: Player Net Worth Calculation}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.pay_out(500)}.
-        \item \textbf{Expected Output:} Returns 500, balance decreases by 500.
-        \item \textbf{Justification:} Ensures money is correctly withdrawn from the reserve for payouts.
+        \item \textbf{Why needed:} Verifies that the net worth variable accurately reflects both liquid cash and asset value.
+        \item \textbf{Logic/Errors Found:} \textbf{Error Found:} The function returned only \texttt{self.balance}. It missed the sum of \texttt{prop.price} for all owned properties. Fixed by iterating through \texttt{self.properties}.
     \end{itemize}
 
-    \item \textbf{Insufficient Funds Payout}
+    \item \textbf{Test Case: Bank Loan Fund Integrity}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.pay_out(bank.get_balance() + 1)}.
-        \item \textbf{Expected Output:} \texttt{ValueError} with diagnostic message.
-        \item \textbf{Justification:} Prevents the bank from going into an illegal negative state.
+        \item \textbf{Why needed:} Ensures the Bank's internal \texttt{_funds} variable is synchronized with payouts.
+        \item \textbf{Logic/Errors Found:} \textbf{Critical Issue:} The \texttt{give_loan} method added money to the player but did not deduct it from the bank's reserves, creating "phantom money". Fixed to call \texttt{pay_out}.
     \end{itemize}
 
-    \item \textbf{Loan Issuance State Change}
+    \item \textbf{Test Case: Dice Roll Range (1-6)}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.give_loan(player1, 1000)}.
-        \item \textbf{Expected Output:} Player balance inc 1000, loan\_count inc 1.
-        \item \textbf{Justification:} Validates the multi-state update during the loan process.
+        \item \textbf{Why needed:} Validates the stochastic boundary of the dice component.
+        \item \textbf{Logic/Errors Found:} \textbf{Bug Found:} Used \texttt{random.randint(1, 5)}, making it impossible to roll a 6 or certain doubles combinations. Fixed to \texttt{(1, 6)}.
     \end{itemize}
 
-    \item \textbf{Zero-Value Loan Handling}
+    \item \textbf{Test Case: Triple Doubles (Jail Logic)}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.give_loan(player, 0)}.
-        \item \textbf{Expected Output:} No change in loan count.
-        \item \textbf{Justification:} Gracefully ignores non-operational loan requests.
-    \end{itemize}
-\end{enumerate}
-
-\subsection{Player Logic (20+ Cases)}
-\begin{enumerate}
-    \item \textbf{Standard Movement}
-    \begin{itemize}
-        \item \textbf{Input:} \texttt{player.move(5)}.
-        \item \textbf{Expected Output:} \texttt{position == 5}.
-        \item \textbf{Justification:} Validates basic position updates.
+        \item \textbf{Why needed:} Tests the state transition based on the \texttt{doubles_streak} counter.
+        \item \textbf{Logic/Errors Found:} \textbf{Bug Found:} The \texttt{Dice} class was missing the \texttt{is_triple_doubles()} method, leading to an \texttt{AttributeError} when the condition was met. Added the method.
     \end{itemize}
 
-    \item \textbf{Board Wrap-Around (GO Pass)}
+    \item \textbf{Test Case: Rent Doubling (Full Group Ownership)}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{player.move(36)} from pos 5 (Total 41).
-        \item \textbf{Expected Output:} \texttt{position == 1}, \texttt{balance += 200}.
-        \item \textbf{Justification:} Ensures salary is credited and modulo arithmetic is correct for the 40-tile board.
+        \item \textbf{Why needed:} Tests complex branch logic in the \texttt{get_rent()} method.
+        \item \textbf{Logic/Errors Found:} Verified that the multiplier is only applied when every property in the \texttt{PropertyGroup} is owned by the same player.
     \end{itemize}
 
-    \item \textbf{Net Worth (Liquid Cash)}
+    \item \textbf{Test Case: Mortgage State Transitions}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{player.balance = 1000}.
-        \item \textbf{Expected Output:} \texttt{net_worth() == 1000}.
-        \item \textbf{Justification:} Basic net worth check.
+        \item \textbf{Why needed:} Tests the \texttt{is_mortgaged} flag and its effect on rent and availability.
+        \item \textbf{Logic/Errors Found:} Ensures rent returns 0 when mortgaged, preventing illegal income.
     \end{itemize}
 
-    \item \textbf{Jail Transition}
+    \item \textbf{Test Case: Bank Insufficient Funds Payout}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{player.go_to_jail()}.
-        \item \textbf{Expected Output:} \texttt{in_jail == True}, \texttt{position == 10}.
-        \item \textbf{Justification:} Ensures state and position are synchronized during penalties.
+        \item \textbf{Why needed:} Edge case for when the bank's capital pool is exhausted.
+        \item \textbf{Logic/Errors Found:} Validated that a \texttt{ValueError} is raised with a clear message, preventing negative bank balances.
     \end{itemize}
 
-    \item \textbf{Negative Fund Management}
+    \item \textbf{Test Case: Player Negative Deduction/Addition}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{player.add_money(-1)}.
-        \item \textbf{Expected Output:} \texttt{ValueError}.
-        \item \textbf{Justification:} Prevents logical errors in the accounting module.
-    \end{itemize}
-\end{enumerate}
-
-\subsection{Property and Management (10+ Cases)}
-\begin{enumerate}
-    \item \textbf{Rent Doubling Rule}
-    \begin{itemize}
-        \item \textbf{Input:} Ownership of full color group (e.g., P1 and P2).
-        \item \textbf{Expected Output:} \texttt{p1.get_rent()} returns $2 \times$ base rent.
-        \item \textbf{Justification:} Validates board economics and group ownership logic.
-    \end{itemize}
-
-    \item \textbf{Mortgage Mechanism}
-    \begin{itemize}
-        \item \textbf{Input:} \texttt{property.mortgage()}.
-        \item \textbf{Expected Output:} \texttt{is_mortgaged == True}, \texttt{rent == 0}, \texttt{player_balance += 50}.
-        \item \textbf{Justification:} Checks state transitions for mortgaged properties.
-    \end{itemize}
-
-    \item \textbf{Unmortgage Cost Calculation}
-    \begin{itemize}
-        \item \textbf{Input:} \texttt{property.unmortgage()} for a 50 loan.
-        \item \textbf{Expected Output:} \texttt{cost == 55} (10\% processing fee).
-        \item \textbf{Justification:} Validates the interest rate logic for lifting mortgages.
+        \item \textbf{Why needed:} Edge case for unexpected input values (negative amounts).
+        \item \textbf{Logic/Errors Found:} Added guard clauses and \texttt{ValueError} raises for negative inputs to prevent accounting corruption.
     \end{itemize}
 \end{enumerate}
 
 \section{Detailed Bug Reports}
+As required, the following errors were corrected, and each change was saved as a specific "Error #" commit.
 
 \begin{enumerate}
-    \item \textbf{Bank Loan Fund Leak [CRITICAL]}
+    \item \textbf{Error 1: Move logic and Salary}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{bank.give_loan(player, 1000)} where Bank balance = 50,000.
-        \item \textbf{Expected Result:} \texttt{bank_balance == 49,000}.
-        \item \textbf{Actual Result:} \texttt{bank_balance == 50,000}.
-        \item \textbf{Root Cause:} The \texttt{give_loan} method adds money to the player's wallet but forgets to call the internal \texttt{pay_out} or deduction method for the bank's own reserves.
+        \item \textbf{Issue:} Passing Go did not award \$200.
+        \item \textbf{Fix:} Updated \texttt{Player.move()} to check \texttt{new_pos < old_pos}.
     \end{itemize}
-
-    \item \textbf{Player Net Worth Value Error}
+    \item \textbf{Error 2: Dice Range}
     \begin{itemize}
-        \item \textbf{Input:} Player with \$500 cash and owning "Park Place" (Value: \$350).
-        \item \textbf{Expected Result:} \texttt{net_worth() == 850}.
-        \item \textbf{Actual Result:} \texttt{net_worth() == 500}.
-        \item \textbf{Root Cause:} The \texttt{get_net_worth()} implementation only sums the \texttt{self.balance} attribute and does not iterate through the \texttt{self.properties} list to add their current market value.
+        \item \textbf{Issue:} \texttt{randint(1, 5)} excluded 6.
+        \item \textbf{Fix:} Updated to \texttt{randint(1, 6)} in \texttt{dice.py}.
+    \end{itemize}
+    \item \textbf{Error 3: Missing Jail Method}
+    \begin{itemize}
+        \item \textbf{Issue:} \texttt{is_triple_doubles()} was undefined.
+        \item \textbf{Fix:} Added method to \texttt{Dice} class.
     \end{itemize}
 \end{enumerate}
-
 \end{document}
