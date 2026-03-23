@@ -1,4 +1,6 @@
-import sys
+"""
+This module represents a player in the MoneyPoly game.
+"""
 from moneypoly.config import STARTING_BALANCE, BOARD_SIZE, GO_SALARY, JAIL_POSITION
 
 
