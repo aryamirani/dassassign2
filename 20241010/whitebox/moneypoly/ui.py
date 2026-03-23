@@ -55,6 +55,10 @@ def print_board_ownership(board):
     print("  (* = mortgaged)")
 
 
+"""
+This module contains helper functions for the UI and user interaction.
+"""
+
 def format_currency(amount):
     """Return a formatted currency string, e.g. '$1,500'."""
     return f"${amount:,}"
@@ -66,7 +70,7 @@ def safe_int_input(prompt, default=0):
     """
     try:
         return int(input(prompt))
-    except:
+    except (ValueError, EOFError):
         return default
 
 
