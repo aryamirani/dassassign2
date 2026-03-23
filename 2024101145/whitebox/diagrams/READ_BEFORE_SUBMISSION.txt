@@ -1,7 +1,0 @@
-# White Box Diagrams Placeholder
-Hand-drawn Control Flow Graphs (CFGs) for the MoneyPoly system are typically attached here in the final submission package.
-The CFGs detail the logical paths for the following methods:
-1. `Bank.give_loan()` - Highlighting the critical balance update branch.
-2. `Player.get_net_worth()` - Showing the iteration over properties.
-3. `Property.get_rent()` - Detailing the color-group ownership doubling logic.
-4. `Player.move()` - Illustrating the board wrap-around/modulo logic.
