@@ -31,7 +31,7 @@ def test_add_to_cart_zero_quantity(headers):
     assert response.status_code == 400
 
 def test_add_non_existent_product(headers):
-    payload = {"product_id": "99999", "quantity": 1}
+    payload = {"product_id": 99999, "quantity": 1}
     response = requests.post(f"{BASE_URL}/cart/add", headers=headers, json=payload)
     assert response.status_code == 404
 
