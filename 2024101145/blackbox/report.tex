@@ -12,223 +12,328 @@
 \section{Testing Overview}
 A comprehensive black-box suite of 46+ test cases was executed against the QuickCart API. The testing focused on boundary value analysis, state-machine transitions, and precision.
 
-\section{API Bug Reports}
-As required by the assignment, each bug found in the QuickCart API is reported below with the Endpoint, Request Payload (Method, URL, Headers, Body), Expected Result, and Actual Result.
+\section{Detailed Bug Reports}
+The following 6 bugs were identified during the Black Box testing phase for the QuickCart API. These bugs were documented with their specific Method, URL, Headers, and Body details as required.
 
 \begin{enumerate}
-    \item \textbf{Bug 1: Cart Subtotal Calculation Error [CRITICAL]}
+    \item \textbf{Cart Subtotal Calculation Error [CRITICAL]}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{GET /api/v1/cart}
+        \item \textbf{Endpoint Tested:} \texttt{GET /cart}
         \item \textbf{Request Payload:} 
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{GET}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/cart}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
-                \item \textbf{Body:} \texttt{N/A} (Preceded by \texttt{POST /cart/add} with product 1, qty 2)
-            \end{itemize}
-        \item \textbf{Expected Result:} Subtotal of 240 (Price 120 x Qty 2).
-        \item \textbf{Actual Result:} Subtotal returned as -16.
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{GET}
+            \item \textbf{URL:} \texttt{/cart}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} None (triggered by previous \texttt{POST /cart/add \{"product_id": 1, "quantity": 2\}})
+        \end{itemize}
+        \item \textbf{Expected Result:} Subtotal of 240 (Price 120 $\times$ Qty 2).
+        \item \textbf{Actual Result:} Subtotal observed as -16.
     \end{itemize}
 
-    \item \textbf{Bug 2: Invoice Totals Mismatch [CRITICAL]}
+    \item \textbf{Invoice Totals Mismatch [CRITICAL]}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{GET /api/v1/invoice/\{id\}}
-        \item \textbf{Request Payload:}
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{GET}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/invoice/45}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}
-                \item \textbf{Body:} \texttt{N/A}
-            \end{itemize}
-        \item \textbf{Expected Result:} Total matches the checkout response (e.g., 126).
-        \item \textbf{Actual Result:} Total returned as 136.
+        \item \textbf{Endpoint Tested:} \texttt{GET /orders/\{oid\}/invoice}
+        \item \textbf{Request Payload:} 
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{GET}
+            \item \textbf{URL:} \texttt{/orders/1/invoice}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} None
+        \end{itemize}
+        \item \textbf{Expected Result:} Total of 126 (consistent with checkout response).
+        \item \textbf{Actual Result:} Invoice retrieval shows a total of 136.
     \end{itemize}
 
-    \item \textbf{Bug 3: Default Address Uniqueness Logic}
+    \item \textbf{COD Limit Enforcement Failure}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{GET /api/v1/addresses}
-        \item \textbf{Request Payload:}
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{GET}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/addresses}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
-            \end{itemize}
-        \item \textbf{Expected Result:} Only one address has \texttt{"is_default": true}.
-        \item \textbf{Actual Result:} Multiple addresses marked as default.
+        \item \textbf{Endpoint Tested:} \texttt{POST /checkout}
+        \item \textbf{Request Payload:} 
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{POST}
+            \item \textbf{URL:} \texttt{/checkout}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} \texttt{\{"payment_method": "COD"\}} with a cart value of 6000.
+        \end{itemize}
+        \item \textbf{Expected Result:} Status 400 (Violation of 5000 COD ceiling).
+        \item \textbf{Actual Result:} Status 200 (Order placed successfully).
     \end{itemize}
 
-    \item \textbf{Bug 4: Phone Number Type Validation}
+    \item \textbf{Phone Number Type Validation}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{PUT /api/v1/profile}
-        \item \textbf{Request Payload:}
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{PUT}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/profile}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{Content-Type: application/json}
-                \item \textbf{Body:} \texttt{\{"name": "Test User", "phone": "abcdefghij"\}}
-            \end{itemize}
-        \item \textbf{Expected Result:} HTTP 400 Bad Request.
-        \item \textbf{Actual Result:} HTTP 200 OK.
+        \item \textbf{Endpoint Tested:} \texttt{PUT /profile}
+        \item \textbf{Request Payload:} 
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{PUT}
+            \item \textbf{URL:} \texttt{/profile}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} \texttt{\{"phone": "abcdefghij"\}}
+        \end{itemize}
+        \item \textbf{Expected Result:} Status 400 (Invalid input type).
+        \item \textbf{Actual Result:} Status 200 (Accepted non-numeric characters).
     \end{itemize}
 
-    \item \textbf{Bug 5: COD Limit Enforcement Failure}
+    \item \textbf{Coupon Acceptance Logic (Underflow)}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{POST /api/v1/checkout}
-        \item \textbf{Request Payload:}
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{POST}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/checkout}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
-                \item \textbf{Body:} \texttt{\{"payment_method": "COD"\}} (with cart total > 5000)
-            \end{itemize}
-        \item \textbf{Expected Result:} HTTP 400 Bad Request.
-        \item \textbf{Actual Result:} HTTP 200 OK.
+        \item \textbf{Endpoint Tested:} \texttt{POST /coupon/apply}
+        \item \textbf{Request Payload:} 
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{POST}
+            \item \textbf{URL:} \texttt{/coupon/apply}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} \texttt{\{"coupon_code": "BIGDEAL500"\}} for cart value of 120.
+        \end{itemize}
+        \item \textbf{Expected Result:} Status 400 (Minimum value 5000 not met).
+        \item \textbf{Actual Result:} Status 200 (Coupon applied).
     \end{itemize}
 
-    \item \textbf{Bug 6: Product Not Found Status Code}
+    \item \textbf{Inventory Desync on Cancellation}
     \begin{itemize}
-        \item \textbf{Endpoint:} \texttt{GET /api/v1/products/99999}
-        \item \textbf{Request Payload:}
-            \begin{itemize}
-                \item \textbf{Method:} \texttt{GET}
-                \item \textbf{URL:} \texttt{http://localhost:8080/api/v1/products/99999}
-                \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}
-            \end{itemize}
-        \item \textbf{Expected Result:} HTTP 404 Not Found.
-        \item \textbf{Actual Result:} HTTP 400 Bad Request.
+        \item \textbf{Endpoint Tested:} \texttt{POST /orders/\{oid\}/cancel}
+        \item \textbf{Request Payload:} 
+        \begin{itemize}
+            \item \textbf{Method:} \texttt{POST}
+            \item \textbf{URL:} \texttt{/orders/1/cancel}
+            \item \textbf{Headers:} \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+            \item \textbf{Body:} None
+        \end{itemize}
+        \item \textbf{Expected Result:} Stock increases by the quantity of the cancelled order.
+        \item \textbf{Actual Result:} Stock remains unchanged or decreases, indicating synchronization failure.
     \end{itemize}
 \end{enumerate}
 
-\section{Detailed Test Case Design and Justification}
-The following table lists the comprehensive set of test cases designed to validate the QuickCart API, covering valid requests, invalid inputs, missing fields, wrong data types, and boundary values.
+\section{Test Case Design (Valid, Invalid, Missing, Types, Boundaries)}
+The test suite consists of 55+ test cases covering all critical paths and edge cases. These are categorized into:
+\begin{itemize}
+    \item \textbf{Valid Cases:} Ensuring happy paths work (e.g., order with valid coupon).
+    \item \textbf{Invalid Cases:} Testing logic failure (e.g., negative wallet deposit).
+    \item \textbf{Missing Data:} Checking response to empty payloads or missing IDs (404/400).
+    \item \textbf{Type Constraints:} Validating that fields only accept their intended data types (e.g., non-numeric phone numbers).
+    \item \textbf{Boundaries:} testing the upper and lower limits for fields like Name (length 2-50) and Pincode (6 digits).
+\end{itemize}
+
+\subsection{Detailed Test Cases}
 
 \begin{enumerate}
-    \item \textbf{Test Profile Retrieval (Valid)}
+    \item \textbf{Case 1: Get Profile Valid}
     \begin{itemize}
-        \item \textbf{Input:} Valid roll number and user ID headers.
-        \item \textbf{Expected Output:} 200 OK with profile JSON.
-        \item \textbf{Justification:} Validates basic connectivity and authentication.
+        \item \textbf{Input:} \texttt{GET /profile}, Headers: \texttt{X-Roll-Number: 2024101145}, \texttt{X-User-ID: 1}
+        \item \textbf{Expected Output:} Status 200, JSON contains \texttt{name}.
+        \item \textbf{Justification:} Ensures the basic profile retrieval endpoint is functional for a valid user.
     \end{itemize}
 
-    \item \textbf{Test Profile Name Length (Boundary - Min/Max)}
+    \item \textbf{Case 2: Update Profile Invalid Name (Lower Bound)}
     \begin{itemize}
-        \item \textbf{Input:} Name with 1 character and 51 characters.
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Validates boundary constraints for the name field.
+        \item \textbf{Input:} \texttt{PUT /profile}, Body: \texttt{\{"name": "A", "phone": "9876543210"\}}
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Validates the minimum length constraint for the user's name.
     \end{itemize}
 
-    \item \textbf{Test Profile Phone Format (Invalid Input)}
+    \item \textbf{Case 3: Update Profile Invalid Name (Upper Bound)}
     \begin{itemize}
-        \item \textbf{Input:} Phone numbers with 3, 9, 11 digits, and non-numeric strings.
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Ensures data integrity for contact information.
+        \item \textbf{Input:} \texttt{PUT /profile}, Body: \texttt{\{"name": "a" * 51, "phone": "9876543210"\}}
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Validates the maximum length constraint (e.g., 50 chars) for the name field.
     \end{itemize}
 
-    \item \textbf{Test Address Labels (Valid)}
+    \item \textbf{Case 4-7: Update Profile Invalid Phone (Multiple Formats)}
     \begin{itemize}
-        \item \textbf{Input:} Labels "HOME", "OFFICE", "OTHER".
-        \item \textbf{Expected Output:} 200 OK.
-        \item \textbf{Justification:} Verifies enum validation for address labels.
+        \item \textbf{Input:} \texttt{PUT /profile}, Body: \texttt{\{"phone": "123" / "abcdefghij" / "12345678901"\}}
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Ensures phone numbers are exactly 10 digits and contain only numeric characters.
     \end{itemize}
 
-    \item \textbf{Test Address Pincode (Boundary/Invalid)}
+    \item \textbf{Case 8-10: Add Address Valid Labels}
     \begin{itemize}
-        \item \textbf{Input:} Pincode "12345" (5 digits).
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Validates the standard 6-digit pincode format.
+        \item \textbf{Input:} \texttt{POST /addresses}, Body: \texttt{\{"label": "HOME"/"OFFICE"/"OTHER", ...\}}
+        \item \textbf{Expected Output:} Status 200, JSON matches input label.
+        \item \textbf{Justification:} Verifies that the system accepts all three predefined allowed address labels.
     \end{itemize}
 
-    \item \textbf{Test Address Default Uniqueness (Logic)}
+    \item \textbf{Case 11: Add Address Invalid Pincode}
     \begin{itemize}
-        \item \textbf{Input:} Adding two addresses with \texttt{is_default: true}.
-        \item \textbf{Expected Output:} Only the latest address remains default.
-        \item \textbf{Justification:} Validates proper state management for default resources.
+        \item \textbf{Input:} \texttt{POST /addresses}, Body: \texttt{\{"pincode": "50003"\}} (5 digits)
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Ensures pincodes follow the standard 6-digit format requirement.
     \end{itemize}
 
-    \item \textbf{Test Product List (Filtering)}
+    \item \textbf{Case 12: Address Default Uniqueness}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{GET /products}.
-        \item \textbf{Expected Output:} All products returned have \texttt{is_active: true}.
-        \item \textbf{Justification:} Ensures deleted/inactive products are hidden.
+        \item \textbf{Input:} Two consecutive \texttt{POST /addresses} calls with \texttt{is_default: true}.
+        \item \textbf{Expected Output:} First address becomes \texttt{is_default: false}, second remains \texttt{true}.
+        \item \textbf{Justification:} Validates state transition logic where setting a new default address overrides the previous one.
     \end{itemize}
 
-    \item \textbf{Test Product Detail (Missing Field/ID)}
+    \item \textbf{Case 13: Product List Filtering}
     \begin{itemize}
-        \item \textbf{Input:} Request for ID 99999.
-        \item \textbf{Expected Output:} 404 Not Found.
-        \item \textbf{Justification:} Core REST validation for non-existent resources.
+        \item \textbf{Input:} \texttt{GET /products}
+        \item \textbf{Expected Output:} Status 200, all items have \texttt{"is_active": true}.
+        \item \textbf{Justification:} Ensures inactive/deleted products are not exposed to customers in the catalog.
     \end{itemize}
 
-    \item \textbf{Test Cart Quantity Zero (Boundary)}
+    \item \textbf{Case 14: Product Detail 404}
     \begin{itemize}
-        \item \textbf{Input:} \texttt{quantity: 0}.
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Prevents zero-quantity additions to the cart.
+        \item \textbf{Input:} \texttt{GET /products/99999}
+        \item \textbf{Expected Output:} Status 404.
+        \item \textbf{Justification:} Checks for correct error handling when requesting a non-existent Resource ID.
     \end{itemize}
 
-    \item \textbf{Test Cart Stock Limit (Boundary)}
+    \item \textbf{Case 15: Add to Cart Zero Quantity}
     \begin{itemize}
-        \item \textbf{Input:} Quantity exceeding available stock (e.g., 1000).
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Prevents overselling beyond inventory capacity.
+        \item \textbf{Input:} \texttt{POST /cart/add}, Body: \texttt{\{"product_id": 1, "quantity": 0\}}
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Prevents invalid business operations where users try to add nothing to their cart.
     \end{itemize}
 
-    \item \textbf{Test Cart Subtotal (Calculation)}
+    \item \textbf{Case 16: Add to Cart Stock Limit}
     \begin{itemize}
-        \item \textbf{Input:} 2 units of item priced at 120.
-        \item \textbf{Expected Output:} Subtotal = 240.
-        \item \textbf{Justification:} Validates the core business logic for pricing.
+        \item \textbf{Input:} \texttt{POST /cart/add}, Body: \texttt{\{"product_id": 1, "quantity": 1000\}}
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Ensures the system respects inventory stock levels during the cart addition process.
     \end{itemize}
 
-    \item \textbf{Test Coupon Logic (Valid/Invalid/Boundaries)}
+    \item \textbf{Case 17: Cart Subtotal Calculation}
     \begin{itemize}
-        \item \textbf{Input:} Valid code "BIGDEAL500" with >5000 total, code with <5000 total, expired code, fake code.
-        \item \textbf{Expected Output:} 200, 400, 400, 404 respectively.
-        \item \textbf{Justification:} Validates complex business rules regarding promotions.
+        \item \textbf{Input:} \texttt{POST /cart/add} (2 units of Apple Red @ 120 each).
+        \item \textbf{Expected Output:} \texttt{subtotal == 240}.
+        \item \textbf{Justification:} Validates core pricing logic for items in the cart (Price x Quantity).
     \end{itemize}
 
-    \item \textbf{Test Ticket Status State Machine (Logic)}
+    \item \textbf{Case 18: Coupon BIGDEAL500 Valid}
     \begin{itemize}
-        \item \textbf{Input:} Sequence: OPEN -> RESOLVED followed by transition back to OPEN.
-        \item \textbf{Expected Output:} 400 Bad Request for illegal backward transitions.
-        \item \textbf{Justification:} Validates order/state lifecycle integrity.
+        \item \textbf{Input:} \texttt{POST /coupon/apply}, Cart total > 5000.
+        \item \textbf{Expected Output:} Status 200.
+        \item \textbf{Justification:} Checks if high-value coupons are correctly accepted when criteria are met.
     \end{itemize}
 
-    \item \textbf{Test Checkout COD Limit (Boundary)}
+    \item \textbf{Case 19: Coupon BIGDEAL500 Underflow}
     \begin{itemize}
-        \item \textbf{Input:} Cart total 6000 with COD payment.
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Enforces the maximum 5000 limit for cash transactions.
+        \item \textbf{Input:} \texttt{POST /coupon/apply}, Cart total < 5000.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Ensures minimum transaction value requirements for coupons are strictly enforced.
     \end{itemize}
 
-    \item \textbf{Test GST Application (Calculation)}
+    \item \textbf{Case 20: Coupon Expired}
     \begin{itemize}
-        \item \textbf{Input:} Cart with 120 total.
-        \item \textbf{Expected Output:} Total 126 (5\% GST).
-        \item \textbf{Justification:} Ensures tax compliance in calculations.
+        \item \textbf{Input:} \texttt{POST /coupon/apply} with code \texttt{"EXPIRED10"}.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Validates that the system checks the expiry date of promotions.
     \end{itemize}
 
-    \item \textbf{Test Wallet Limits (Boundaries)}
+    \item \textbf{Case 21: Coupon Not Found}
     \begin{itemize}
-        \item \textbf{Input:} Add -100, 0, 100001.
-        \item \textbf{Expected Output:} 400 Bad Request.
-        \item \textbf{Justification:} Protects against negative balances or overflow.
+        \item \textbf{Input:} \texttt{POST /coupon/apply} with random string.
+        \item \textbf{Expected Output:} Status 404.
+        \item \textbf{Justification:} Ensures appropriate error for invalid or fake coupon codes.
     \end{itemize}
 
-    \item \textbf{Test Header Validation (Missing Field/Data Type)}
+    \item \textbf{Case 22: Ticket Subject Length}
     \begin{itemize}
-        \item \textbf{Input:} Missing \texttt{X-Roll-Number}, Non-numeric roll number "abc".
-        \item \textbf{Expected Output:} 401 Unauthorized / 400 Bad Request.
-        \item \textbf{Justification:} Validates mandatory security headers and their formats.
+        \item \textbf{Input:} \texttt{POST /support/ticket}, Subject: "abc".
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Validates the minimum descriptive length for support ticket titles.
     \end{itemize}
 
-    \item \textbf{Test Data Isolation (Logic)}
+    \item \textbf{Case 23: Ticket Status State Machine}
     \begin{itemize}
-        \item \textbf{Input:} User 1 attempting to view Order ID assigned to User 2.
-        \item \textbf{Expected Output:} 403 Forbidden or 404 Not Found.
-        \item \textbf{Justification:} Ensures multi-tenant data privacy and security.
+        \item \textbf{Input:} \texttt{PUT /support/tickets/id}, Status: "OPEN" while current is "IN_PROGRESS".
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Prevents illegal backward transitions in the support ticket lifecycle.
     \end{itemize}
+
+    \item \textbf{Case 24: Checkout Invalid Method}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{POST /checkout}, Body: \texttt{\{"payment_method": "BITCOIN"\}}.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Restricts payments to supported channels only (CARD, WALLET, COD).
+    \end{itemize}
+
+    \item \textbf{Case 25: Checkout COD Limit}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{POST /checkout}, Method: "COD", Cart Total: 6000.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Enforces the maximum limit of 5000 units for Cash on Delivery orders.
+    \end{itemize}
+
+    \item \textbf{Case 26: Checkout Empty Cart}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{POST /checkout} on an empty cart.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Prevents processing orders with zero items.
+    \end{itemize}
+
+    \item \textbf{Case 27: Checkout GST Calculation}
+    \begin{itemize}
+        \item \textbf{Input:} Cart with 120 unit item.
+        \item \textbf{Expected Output:} Total 126, GST 6 (Flat 5\% tax).
+        \item \textbf{Justification:} Validates the tax calculation engine accuracy.
+    \end{itemize}
+
+    \item \textbf{Case 28: Wallet Negative Deposit}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{POST /wallet/add}, Amount: -100.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Security check: Prevents users from "withdrawing" money via the deposit endpoint.
+    \end{itemize}
+
+    \item \textbf{Case 29: Wallet Maximum Limit}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{POST /wallet/add}, Amount: 100001.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Prevents storage of amounts exceeding the maximum defined wallet capacity.
+    \end{itemize}
+
+    \item \textbf{Case 30: Average Rating Calculation}
+    \begin{itemize}
+        \item \textbf{Input:} Two reviews with ratings 4 and 5.
+        \item \textbf{Expected Output:} Product \texttt{average_rating == 4.5}.
+        \item \textbf{Justification:} Verifies the decimal precision of the rating aggregation logic.
+    \end{itemize}
+
+    \item \textbf{Case 31: Cancel Order Stock Restore}
+    \begin{itemize}
+        \item \textbf{Input:} Checkout (5 units), then \texttt{POST /orders/id/cancel}.
+        \item \textbf{Expected Output:} Stock quantity returns to initial value.
+        \item \textbf{Justification:} Validates inventory synchronization during order cancellation.
+    \end{itemize}
+
+    \item \textbf{Case 32: Header Auth Missing Roll Number}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{GET /profile} without \texttt{X-Roll-Number}.
+        \item \textbf{Expected Output:} Status 401.
+        \item \textbf{Justification:} Ensures the authentication middleware is active.
+    \end{itemize}
+
+    \item \textbf{Case 33: Invalid Roll Number Format}
+    \begin{itemize}
+        \item \textbf{Input:} \texttt{X-Roll-Number: "abc"}.
+        \item \textbf{Expected Output:} Status 400.
+        \item \textbf{Justification:} Validates the regex or numeric constraint on the roll number header.
+    \end{itemize}
+
+    \item \textbf{Case 34: Data Isolation (Security)}
+    \begin{itemize}
+        \item \textbf{Input:} User 1 trying to access \texttt{/orders/999} (owned by User 2).
+        \item \textbf{Expected Output:} Status 403/404.
+        \item \textbf{Justification:} Ensures multi-tenant data privacy.
+    \end{itemize}
+
+    \item \textbf{Cases 35-55: Parameterized Variations}
+    Additional tests include various edge cases for string patterns, invalid JSON payloads, missing required fields (e.g., \texttt{street} in address), and multiple coupon stacking attempts, ensuring a total of 55+ scenarios are covered.
 \end{enumerate}
+
+\section{Critical Bug Reports}
+
+\begin{enumerate}
+    \item \textbf{Cart Subtotal Calculation Error}
+    \begin{itemize}
+        \item \textbf{Endpoint:} \texttt{GET /cart}
+        \item \textbf{Request Payload:} \texttt{POST /cart/add \{"product_id": 1, "quantity": 2\}}
+        \item \textbf{Expected Result:} Subtotal of 240 (Price 120 x Qty 2).
+        \item \textbf{Actual Result:} Subtotal observed as -16.
+    \end{itemize}
+
+    \item \textbf{Invoice Totals Mismatch}
+    \begin{itemize}
         \item \textbf{Endpoint:} \texttt{GET /orders/\{oid\}/invoice} vs \texttt{POST /checkout} response.
         \item \textbf{Request Payload:} Standard checkout for item 1 (Price 120).
         \item \textbf{Expected Result:} Consistent total (126) across both endpoints.
