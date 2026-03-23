@@ -32,6 +32,10 @@ class Dice:
         """Return True if both dice show the same value."""
         return self.die1 == self.die2
 
+    def is_triple_doubles(self):
+        """Return True if the player has rolled three consecutive doubles."""
+        return self.doubles_streak >= 3
+
     def total(self):
         """Return the sum of both dice."""
         return self.die1 + self.die2
