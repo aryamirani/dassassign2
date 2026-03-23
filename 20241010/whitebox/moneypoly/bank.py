@@ -1,9 +1,11 @@
-import math
+"""
+This module represents the central bank in MoneyPoly.
+"""
 from moneypoly.config import BANK_STARTING_FUNDS
 
 
 class Bank:
-    def __init__(self):
+    """Represents the bank that handles player transactions."""
         self._funds = BANK_STARTING_FUNDS
         self._loans_issued = []
         self._total_collected = 0
