@@ -1,0 +1,27 @@
+c5369295f44b1571170dd3528823023b63d66fb2|Initial commit: Set up folder structure
+5c925797ef44b20ca9b8a4834d16f9c431e17ddb|Initialize whitebox directory with MoneyPoly source code
+10bb2086fca81fb5ba54ad39819046067e3f1685|Iteration 1: Fix docstrings, unmortgage else, and all_owned_by logic in property.py
+e166c75f8adaf99857b960a153a7e561eee594f6|Iteration 2: Fix module docstring and singleton comparison in board.py
+1c03279fb0ad0d1b1f35bf00a388ee7c1972578f|Iteration 3: Fix docstrings and bare except in ui.py
+bd86f474ebb33f8c8923509c30418602b851679b|Iteration 4: Fix module docstring, redundant parens, and unused imports in game.py
+969972551b8016bf92ca1915d09a8f5ff97ebcf4|Iteration 5: Fix docstrings and unused math import in bank.py
+62b6256565334866a504889f76375346c91b74db|Iteration 6: Fix module docstring and unused sys import in player.py
+90064a1484ecd94de0397a2f59630995ae03e465|Iteration 7: Fix module docstring, unused import, and attribute-defined-outside-init in dice.py
+b6b57a538aec340f797abd4bcb6b495c20fd7e3d|Iteration 8: Fix docstrings in main.py
+dbf869a227ec95a1cd52f4a7be41bcc9226b3b55|Iteration 9: Fix syntax error in bank.py
+bb01bf2bee819cd507ffb3c0af42126d115741a3|Error 1: Fix player move logic to award salary when passing Go
+e6c052ffaa9036d28ae16c04824e66e2a80f7f46|Error 2: Fix dice roll range from (1,5) to (1,6)
+ad4b58ae866236fb65e94d2fe875319443453ba2|Error 3: Add missing is_triple_doubles method to Dice class
+c39e23fa8af323158f79b0e17c4bf700af083ca3|Initialize whitebox tests and fix regex in bank test
+7656c635bd93436c055b5c4e0045a845f4944519|Integration: Implement Registration Module for street race system
+69f8b7ad027f24d8343b62e9b1223e071fc7a853|Integration: Implement Crew Management Module with role and skill tracking
+99e132219907bbfb9080926793f937950b583a1a|Integration: Implement Inventory Module with car tracking and cash management
+98e6758d419a72a7b0c655deaa14e4bdf489d746|Integration: Implement Race Management Module with driver/car validation
+597c700cef49ac950503d314b886d3497ba576d9|Integration: Implement Results Module with prize money and ranking updates
+599896203734cc06d59ade33cd6235d7acd47ff9|Integration: Implement Mission Planning Module with mechanic requirement checking
+066f3623378540176029a03083126338f715d695|Integration: Implement extra modules (Betting and Reputation)
+139f9b6ab12e3fb6c5af3ada5d67e5a63ece33e9|Integration: Design and run integration tests for all modules
+34d9119be219c4e3caf17fd50119e8ce5576bc32|Black Box: Design comprehensive API test cases based on documentation
+6513756d6b079d70c3932e375e902552dcbb8529|Finalize assignment: Add README.md with project overview and running instructions
+b9571eac97fc5c7e5c777036ecd992d4e94cd8c7|Black Box: Finalize API tests with correct data types for products
+f2b6083be16e8a5a73ef5252b4e7f80c90d4a6ae|Correct folder name to roll number 2024101145
