@@ -3,7 +3,7 @@
 **Name:** Arya Mirani  
 
 ## Repository Link
-https://github.com/aryamirani/2024101145-DASS-Assignment2
+https://github.com/aryamirani/dassassign2
 
 ## Unified Test Execution
 To run all tests (Black Box, White Box, and Integration) from the root project folder:
